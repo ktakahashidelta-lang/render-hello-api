@@ -1,14 +1,20 @@
 const express = require('express');
 const app = express();
 
-// 確認用API
+// どのURLが来たかを必ずログに出す
+app.use((req, _res, next) => {
+  console.log('[REQ]', req.method, req.url);
+  next();
+});
+
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello from Render!' });
 });
 
-// ヘルスチェック（Renderの監視向け・任意）
-app.get('/healthz', (_, res) => res.send('ok'));
+// ベースURLも確認用に追加
+app.get('/', (_req, res) => res.send('OK /'));
 
-// RenderがPORTを環境変数で渡すので必ず使う
+app.get('/healthz', (_req, res) => res.send('ok'));
+
 const port = process.env.PORT || 8080;
 app.listen(port, () => console.log(`Server running on port ${port}`));
