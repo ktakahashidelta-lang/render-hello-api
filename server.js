@@ -1,20 +1,24 @@
 const express = require('express');
 const app = express();
 
-// どのURLが来たかを必ずログに出す
-app.use((req, _res, next) => {
-  console.log('[REQ]', req.method, req.url);
-  next();
-});
-
+// 変更点が分かるようにメッセージを少し変える
 app.get('/api/hello', (req, res) => {
-  res.json({ message: 'Hello from Render!' });
+  res.json({ message: 'Hello from Render v2!' });
 });
 
-// ベースURLも確認用に追加
-app.get('/', (_req, res) => res.send('OK /'));
-
-app.get('/healthz', (_req, res) => res.send('ok'));
+// 起動・ビルドの識別用
+const startedAt = new Date().toISOString();
+app.get('/api/info', (_req, res) => {
+  res.json({
+    startedAt,
+    commit: process.env.RENDER_GIT_COMMIT || 'unknown', // Renderが入れてくれることが多い
+    serviceId: process.env.RENDER_SERVICE_ID || 'n/a'
+  });
+});
 
 const port = process.env.PORT || 8080;
-app.listen(port, () => console.log(`Server running on port ${port}`));
+app.listen(port, () => {
+  console.log('Server running on port', port);
+  console.log('Commit:', process.env.RENDER_GIT_COMMIT);
+  console.log('StartedAt:', startedAt);
+});
